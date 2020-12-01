@@ -225,14 +225,21 @@ function injectJS(config, currentTheme, themeConfig) {
       // hack
       const width = window.getBounds().width;
       window.setBounds({
-          width: width + 1,
+          width: width,
       });
       window.setBounds({
           width,
       });
 
+		window.on('blur', () => {
+			require("child_process").spawn(${JSON.stringify(__dirname + '\\blur-cli.exe')}, [new Uint32Array(window.getNativeWindowHandle().buffer)[0], '--type', ${JSON.stringify(type)}, '--enable', 'false', '--color', '${themeConfig.background}', '--opacity', ${JSON.stringify(opacity)}]);
+		});
+		window.on('focus', () => {
+			require("child_process").spawn(${JSON.stringify(__dirname + '\\blur-cli.exe')}, [new Uint32Array(window.getNativeWindowHandle().buffer)[0], '--type', ${JSON.stringify(type)}, '--enable', 'true', '--color', '${themeConfig.background}', '--opacity', ${JSON.stringify(opacity)}]);
+		});
+
       window.webContents.executeJavaScript(${JSON.stringify("document.body.innerHTML += " + JSON.stringify(injectHTML(config, currentTheme, themeConfig)))})
-    });
+	});
   })
 	`
 }
